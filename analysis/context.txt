@@ -1,0 +1,44 @@
+"情報1: 株式会社エナリスは、法人向けと新電力事業者向けにエネルギーソリューションを提供する企業です。",
+"情報2: 同社は、企業の脱炭素化を支援する「eneGX」ブランドや、小規模設備を統合制御するVPPプラットフォームサービスを提供しています。",
+"情報3: 株式会社エナリスは、電力の需給管理に関する長年のノウハウを持ち、脱炭素社会の実現に貢献しています。"
+
+
+■Claude Codeに聞いてみた
+
+rag_eval_claude.pyは以下のPATHにあります。
+C:\Users\tomom\obsidian-work\obsidian-work\00_Inbox\一時保存\Ragas\RAGAS_LOCAL\rag_eval_claude.py
+
+ただ、このフォルダから、rag_eval_claude.pyを実行するとエラーになります。
+context.txtがみつかりませんとなります。
+
+しかし、以下のPATHに移動し、
+C:\Users\tomom\obsidian-work\obsidian-work
+以下のコマンドであれば、analysisファルダの中のcontext.txtを見つけ実行されます。
+python3 .\00_Inbox\一時保存\Ragas\RAGAS_LOCAL\rag_eval_claude.py
+
+なぜ、RAGAS_LOCALフォルダから、rag_eval_claude.pyを実行するとcontext.txtが見つからないのでしょうか？
+
+
+■回答
+
+パス指定の問題です。コードの103-106行目を見ると：
+
+  with open('00_Inbox/一時保存/Ragas/RAGAS_LOCAL/analysis/context.txt', 'r', encoding='utf-8') as f:
+
+  この相対パスは実行時のカレントディレクトリから解決されます。
+
+  現在の状況：
+  - RAGAS_LOCALフォルダから実行 → カレントディレクトリが C:\Users\tomom\obsidian-work\obsidian-work\00_Inbox\一時保存\Ragas\RAGAS_LOCAL\
+  - そこから 00_Inbox/一時保存/... を探すが存在しない
+  - obsidian-workフォルダから実行 → カレントディレクトリが C:\Users\tomom\obsidian-work\obsidian-work\
+  - そこから 00_Inbox/一時保存/... を探すと正しく見つかる
+
+  解決方法：
+  スクリプトファイルの場所を基準にした絶対パスを使用する修正が必要です：
+
+  import os
+  script_dir = os.path.dirname(os.path.abspath(__file__))
+  context_path = os.path.join(script_dir, 'analysis', 'context.txt')
+
+  これにより、どのディレクトリから実行してもcontext.txtが見つかるようになります。
+  
